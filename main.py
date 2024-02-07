@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
-
+# sdagadsjlghbnsdafkjghbsda
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 디렉토리 설정
