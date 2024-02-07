@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- <link rel="stylesheet" href=".\css\style.css" /> -->
+  </head>
+  <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;200;300;400;500;600;700;800;900&display=swap');
+      *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        font-family: 'Noto Sans KR', sans-serif;
+      }
+      .clearfix::after, .clearfix::before{
+        content: "";
+        display: block;
+        clear: both;
+      }
+
+      body{
+        background-color: black;
+      }
+      .titlebox{
+        padding-bottom: 50px;
+        border-bottom: solid 2px red;
+        text-align: center;
+      }
+
+      .titlebox .title{
+        padding-top: 100px;
+        text-align: center;
+        font-size: 4rem;
+        position: relative;
+      }
+      .titlebox .title::before{
+        content: "";
+        border: solid 2px red;
+        position: absolute;
+        bottom: 35px;
+        left: 785px;  
+        width: 350px;
+        transition: all 0.5s;
+      }
+
+      /* .tltlebox .title:hover::before{
+        cursor: pointer;
+        opacity: 0;
+      } */
+
+      .titlebox .sub_tit{
+        font-size: 1.3rem;
+        text-align: center;
+        /* padding: 10px; */
+        /* background-color: blue; */
+      }
+      .imageup{
+        text-align: center;
+        font-size: 2rem;
+        padding: 50px 0px 10px 0;
+      }
+
+      .desc{
+        text-align: center;
+        margin-bottom: 50px;
+      }
+
+      .box{
+        background-color: white;
+        width: 70%;
+        height: 40%;
+        margin: 0 auto;
+        /* opacity: 0.7; */
+        padding: 30px 0 30px 0;
+      }
+      
+      .formgroup{
+        text-align: center;
+      }
+      
+      .box .sort_tit{
+        color: black;
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+        font-family: 'Noto Sans KR', sans-serif;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .sort, .trash, .trashempty{
+        color: white;
+        background-color: black;
+        padding: 6px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        cursor: pointer;
+      }
+
+      .trash_file{
+        margin-bottom: 50px;
+      }
+      
+      .trashempty{
+        transition: all 0.2s;
+      }
+
+      .trashempty:hover{
+        background-color: red;
+        border-color: red;
+      }
+
+      input{
+        color: #888;
+      }
+
+      .custom-label{
+        background-color: black;
+        cursor: pointer;
+        padding: 7px;
+        border-radius: 10px;
+        font-size: 14px;
+        
+      }
+
+
+      .trash-icon {
+            background-image: url('/static/trash.png'); /* 아이콘 이미지 경로 */
+            width: 24px; /* 아이콘의 너비 */
+            height: 24px; /* 아이콘의 높이 */
+            background-size: contain; /* 이미지 크기를 요소에 맞게 조절 */
+            display: inline-block; /* 인라인 요소로 표시 */
+            vertical-align: middle; /* 수직 정렬 */
+            margin-right: 5px; /* 우측 여백 */
+            cursor: pointer; /* 마우스 커서를 포인터로 변경하여 클릭 가능하도록 설정 */
+        }
+
+    </style>
+  <body>
+    <div class="titlebox">
+      <h1 class="title">X-Remove</h1>
+      <b class="sub_tit">당신의 이별을 정리해드립니다</b>
+    </div>
+    <h2 class="imageup">이미지 업로드</h2>
+    <p class="desc">이별할 사람의 이미지를 업로드하세요.</p>
+    <div class="box">
+      <p class="sort_tit">이미지를 선택해주세요!</p>
+      <div class="formgroup">
+        <form action="/upload_image" method="post" enctype="multipart/form-data">
+          <input type="file" name="x_file" accept="image/png, image/jpeg"  id="file-upload" style="display: none;" onchange="displayFileName()"/>
+          <label for="file-upload" class="custom-label">파일 선택</label>
+          <span id="file-name"></span>
+          <input class="sort" type="submit" value="분류된 폴더에 저장" />
+        </form>
+
+        <form action="/move_to_trash" method="post" enctype="multipart/form-data">
+          <input class="trash_file" type="file" name="x_file" accept="image/png, image/jpeg" />
+          <input class="trash" type="submit" value="휴지통으로 이동" />
+        </form>
+
+        <form class="empty" action="/empty_trash" method="post">
+          <label for="trash-icon" class="trash-icon"></label> <!-- 아이콘 추가 -->
+          <input class="trashempty" type="submit" id="trash-icon" value="휴지통 비우기" /> <!-- 휴지통 비우기 버튼 -->
+        </form>
+      </div>
+    </div>
+
+    <script>
+      //선택한 파일 이름 표시
+      function displayFileName() {
+        const input = document.getElementById('file-upload-button');
+        const fileNameSpan = document.getElementById('file-name');
+        if (input.files.length > 0) {
+            fileNameSpan.textContent = input.files[0].name;
+        } else {
+            fileNameSpan.textContent = '';
+        }
+      }
+    </script>
+  </body>
+
+</html>

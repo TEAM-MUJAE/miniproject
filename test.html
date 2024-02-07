@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Image</title>
+</head>
+<body>
+    <h1>Delete Image</h1>
+    <form id="deleteForm" enctype="multipart/form-data">
+        <label for="file">Select image to delete:</label>
+        <input type="file" id="file" name="file">
+        <button type="button" onclick="deleteImage()">Delete</button>
+    </form>
+
+    <script>
+        async function deleteImage() {
+            const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/delete_image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorMessage = await response.text();
+                    throw new Error(errorMessage || 'Failed to delete image.');
+                }
+
+                const result = await response.json();
+                alert(result.message);
+            } catch (error) {
+                alert(error.message || 'An error occurred while deleting image.');
+            }
+        }
+    </script>
+</body>
+</html>
