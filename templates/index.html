@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>X-Remove</title>
     <!-- <link rel="stylesheet" href=".\css\style.css" /> -->
+    <link rel="icon" href="static/logo.png"/>
   </head>
   <style>
       @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
@@ -153,25 +154,33 @@
       <h1 class="title">X-Remove</h1>
       <b class="sub_tit">당신의 이별을 정리해드립니다</b>
     </div>
-    <h2 class="imageup">이미지 업로드</h2>
+    <br/>
     <p class="desc">이별할 사람의 이미지를 업로드하세요.</p>
     <div class="box">
-      <p class="sort_tit">이미지를 선택해주세요!</p>
-      <div class="formgroup">
+      <div id="loading" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 10; justify-content: center; align-items: center; text-align: center;">
+        <img src="static/loading.gif" alt="로딩 중" style="width: 60px; height: 60px;"/>
+      </div>
+      <div class="formgroup" style="text-align: center;">
+        <p class="sort_tit">이별할 사람 이미지 찾기</p>
         <form id="uploadForm" class="formchoice" action="/upload_image" method="post" enctype="multipart/form-data">
+          <img id="image-preview" style="display:none; width: 100%; max-width: 100px; margin: 20px auto;" />
           <input type="file" name="x_file" accept="image/png, image/jpeg"  id="file-upload" style="display: none;" onchange="displayFileName()"/>
           <label for="file-upload" class="custom-label">파일 선택</label>
           <span class="filename" id="file-name"></span>
-          <input class="sort" type="submit" value="분류된 폴더에 저장" />
+          <input class="sort" type="submit" value="이미지 분류하기" />
         </form>
-
+        <hr/>
+        <br/>
+        <p class="sort_tit">이별할 사람 이미지 삭제하기</p>
         <form id="trashForm" class="formchoice" action="/move_to_trash" method="post" enctype="multipart/form-data">
+          <img id="image-preview2" style="display:none; width: 100%; max-width: 100px; margin: 20px auto;" />
           <input class="trash_file" type="file" name="x_file" accept="image/png, image/jpeg" id="file-upload2" style="display: none;" onchange="displayFileName2()" />
           <label for="file-upload2" class="custom-label">파일 선택</label>
           <span class="filename" id="file-name2"></span>
           <input class="trash" type="submit" value="휴지통으로 이동" />
         </form>
-
+        <br/>
+        <hr/>
         <form id="emptyTrashButton" class="empty" action="/empty_trash" method="post">
           <label for="trash-icon" class="trash-icon"></label> <!-- 아이콘 추가 -->
           <input class="trashempty" type="submit" id="trash-icon" value="휴지통 비우기" /> <!-- 휴지통 비우기 버튼 -->
@@ -204,11 +213,14 @@
         }
       </script>
 
-<script>
+<!-- <script>
 document.addEventListener("DOMContentLoaded", function() {
     const uploadForm = document.getElementById("uploadForm");
     uploadForm.onsubmit = async(e) => {
         e.preventDefault();
+
+        loading.style.display = 'block';
+
         // 파일이 선택되었는지 확인
         if (!uploadForm.x_file.files.length) {
             alert("파일을 선택해 주세요.");
@@ -230,15 +242,20 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            loading.style.display = 'none'; // 응답이 완료되면 로딩 이미지 숨김
         }
     };
 });
-</script>
-<script>
+</script> -->
+<!-- <script>
 document.addEventListener("DOMContentLoaded", function() {
     const trashForm = document.getElementById("trashForm");
     trashForm.onsubmit = async(e) => {
         e.preventDefault();
+
+        loading.style.display = 'block';
+
         // 파일이 선택되었는지 확인
         if (!trashForm.x_file.files.length) {
             alert("파일을 선택해 주세요.");
@@ -260,12 +277,14 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         } catch (error) {
             console.error('Error:', error);
+        } finally {
+            loading.style.display = 'none'; // 응답이 완료되면 로딩 이미지 숨김
         }
     };
 });
-</script>
+</script> -->
 
-<script>
+<!-- <script>
     document.addEventListener("DOMContentLoaded", function() {
         const emptyTrashButton = document.getElementById("emptyTrashButton");
         emptyTrashButton.onclick = async (e) => {
@@ -288,7 +307,132 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         };
     });
-    </script>
+    </script> -->
+
+<script>
+  function displayFileName() {
+    const input = document.getElementById('file-upload');
+    const fileNameSpan = document.getElementById('file-name');
+    const imagePreview = document.getElementById('image-preview');
+    
+    if (input.files.length > 0) {
+      const file = input.files[0];
+      fileNameSpan.textContent = file.name;
+
+      // FileReader 객체 생성
+      const reader = new FileReader();
+
+      // 파일 읽기가 완료되면 실행될 이벤트 핸들러 등록
+      reader.onload = function(e) {
+        // 읽기 작업이 성공적으로 완료되면 이미지 프리뷰에 결과 표시
+        imagePreview.src = e.target.result;
+        imagePreview.style.display = 'block'; // 이미지 프리뷰 보이게 설정
+      };
+
+      // 이미지 파일 읽기 시작
+      reader.readAsDataURL(file);
+    } else {
+      fileNameSpan.textContent = '';
+      imagePreview.style.display = 'none'; // 파일이 선택되지 않았다면 이미지 프리뷰 숨김
+    }
+  }
+</script>
+
+
+<script>
+  function displayFileName2() {
+    const input = document.getElementById('file-upload2');
+    const fileNameSpan = document.getElementById('file-name2');
+    const imagePreview = document.getElementById('image-preview2');
+    
+    if (input.files.length > 0) {
+      const file = input.files[0];
+      fileNameSpan.textContent = file.name;
+
+      // FileReader 객체 생성
+      const reader = new FileReader();
+
+      // 파일 읽기가 완료되면 실행될 이벤트 핸들러 등록
+      reader.onload = function(e) {
+        // 읽기 작업이 성공적으로 완료되면 이미지 프리뷰에 결과 표시
+        imagePreview.src = e.target.result;
+        imagePreview.style.display = 'block'; // 이미지 프리뷰 보이게 설정
+      };
+
+      // 이미지 파일 읽기 시작
+      reader.readAsDataURL(file);
+    } else {
+      fileNameSpan.textContent = '';
+      imagePreview.style.display = 'none'; // 파일이 선택되지 않았다면 이미지 프리뷰 숨김
+    }
+  }
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const uploadForm = document.getElementById("uploadForm");
+    const trashForm = document.getElementById("trashForm");
+    const emptyTrashButton = document.getElementById("emptyTrashButton"); // id가 잘못 지정되어 있습니다. form의 id가 아닌 button의 id로 수정해야 합니다.
+    const loading = document.getElementById('loading');
+  
+    async function handleSubmit(e, form) {
+      e.preventDefault();
+      loading.style.display = 'flex'; // 로딩 이미지 표시
+  
+      if (!form.x_file.files.length) {
+        alert("파일을 선택해 주세요.");
+        loading.style.display = 'none'; // 로딩 이미지 숨김
+        return;
+      }
+  
+      const formData = new FormData(form);
+  
+      try {
+        const action = form.getAttribute("action");
+        const response = await fetch(action, {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await response.json();
+  
+        if (response.ok) {
+          alert("성공적으로 처리되었습니다.");
+        } else {
+          alert(result.message || "처리 중 오류가 발생했습니다.");
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert("오류가 발생했습니다.");
+      } finally {
+        loading.style.display = 'none'; // 로딩 이미지 숨김
+      }
+    }
+  
+    uploadForm.addEventListener("submit", (e) => handleSubmit(e, uploadForm));
+    trashForm.addEventListener("submit", (e) => handleSubmit(e, trashForm));
+    emptyTrashButton.addEventListener("click", async (e) => {
+      e.preventDefault();
+      loading.style.display = 'flex'; // 로딩 이미지 표시
+  
+      try {
+        const response = await fetch('/empty_trash', { method: 'POST' });
+        const result = await response.json();
+  
+        if (response.ok) {
+          alert("휴지통이 성공적으로 비워졌습니다.");
+        } else {
+          alert(result.message || "이미 휴지통이 깨끗합니다.");
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert("오류가 발생했습니다.");
+      } finally {
+        loading.style.display = 'none'; // 로딩 이미지 숨김
+      }
+    });
+  });
+  </script>
+
 
 
   </body>
